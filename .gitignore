@@ -32,3 +32,6 @@ phpunit.xml
 
 # WP-CLI
 wp-cli.local.yml
+
+# Deploy info
+web/deploy.php
