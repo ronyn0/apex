@@ -3,3 +3,64 @@ Theme Name: Apex Child
 Template: astra
 Version: 1.0.0
 */
+
+/* Base */
+body {
+    background-color: #0d0d0d;
+    color: #ffffff;
+}
+
+/* Navigation */
+.main-header {
+    background-color: #0d0d0d !important;
+    border-bottom: 0.5px solid #222 !important;
+}
+
+.main-header-bar {
+    background-color: #0d0d0d !important;
+}
+
+.ast-primary-menu > li > a {
+    color: #888 !important;
+    font-size: 13px !important;
+}
+
+.ast-primary-menu > li > a:hover {
+    color: #ffffff !important;
+}
+
+/* Logo */
+.site-title a {
+    color: #ffffff !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 15px !important;
+}
+
+/* Hero / content area */
+.entry-content,
+.entry-title {
+    color: #ffffff;
+}
+
+/* Red accent */
+a {
+    color: #e24b4a !important;
+}
+
+a:hover {
+    color: #ffffff !important;
+}
+
+/* Buttons */
+.ast-button,
+.wp-block-button__link {
+    background-color: #e24b4a !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.ast-button:hover,
+.wp-block-button__link:hover {
+    background-color: #c03a39 !important;
+}
