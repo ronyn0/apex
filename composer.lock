@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "faaeb71cd702504cb9365bd0c56c9a7f",
+    "content-hash": "b674ed61cc9431b03ecae9033714a82a",
     "packages": [
         {
             "name": "composer/installers",
@@ -1049,6 +1049,24 @@
                 "source": "https://themes.svn.wordpress.org/twentytwentyfive"
             },
             "time": "2025-12-03T00:00:00+00:00"
+        },
+        {
+            "name": "wpackagist-plugin/daggerhart-openid-connect-generic",
+            "version": "3.11.3",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/daggerhart-openid-connect-generic/",
+                "reference": "tags/3.11.3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/daggerhart-openid-connect-generic.3.11.3.zip"
+            },
+            "require": {
+                "composer/installers": "^1.0 || ^2.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/daggerhart-openid-connect-generic/"
         },
         {
             "name": "wpackagist-theme/astra",
