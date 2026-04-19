@@ -64,3 +64,17 @@ a:hover {
 .wp-block-button__link:hover {
     background-color: #c03a39 !important;
 }
+
+body .wp-block-cover,
+body .wp-block-cover__inner-container {
+    background-color: transparent !important;
+}
+
+#wpadminbar,
+#wpadminbar * {
+    color: #ffffff !important;
+}
+
+#wpadminbar {
+    background-color: #1a1a1a !important;
+}
