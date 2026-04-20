@@ -167,6 +167,9 @@ class Astra_API_Init extends WP_REST_Controller {
 				'use_upgrade_notices'   => astra_showcase_upgrade_notices(),
 				'analytics_enabled'     => get_option( 'astra_usage_optin', 'no' ) === 'yes',
 				'show_learn_tab'        => self::get_admin_settings_option( 'show_learn_tab', true ),
+				'enable_abilities'      => self::get_admin_settings_option( 'enable_abilities', false ),
+				'enable_edit_abilities' => self::get_admin_settings_option( 'enable_edit_abilities', true ),
+				'enable_mcp_server'     => self::get_admin_settings_option( 'enable_mcp_server', false ),
 			)
 		);
 
@@ -220,6 +223,14 @@ class Astra_API_Init extends WP_REST_Controller {
 
 		// Save to user meta.
 		update_user_meta( $user_id, 'astra_learn_progress', $saved_progress );
+
+		/**
+		 * Fires after learn progress is saved.
+		 *
+		 * @param array $saved_progress Full progress data for the user.
+		 * @since 4.12.7
+		 */
+		do_action( 'astra_learn_progress_saved', $saved_progress );
 
 		return new WP_REST_Response(
 			array(

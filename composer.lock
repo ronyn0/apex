@@ -1070,15 +1070,15 @@
         },
         {
             "name": "wpackagist-theme/astra",
-            "version": "4.12.6",
+            "version": "4.13.0",
             "source": {
                 "type": "svn",
                 "url": "https://themes.svn.wordpress.org/astra/",
-                "reference": "4.12.6"
+                "reference": "4.13.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/theme/astra.4.12.6.zip"
+                "url": "https://downloads.wordpress.org/theme/astra.4.13.0.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
