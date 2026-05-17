@@ -78,3 +78,11 @@ body .wp-block-cover__inner-container {
 #wpadminbar {
     background-color: #1a1a1a !important;
 }
+
+.wp-block-separator {
+    border-color: #e24b4a !important;
+    border-top: 2px solid #e24b4a !important;
+    width: 32px !important;
+    margin: 1rem auto !important;
+    opacity: 1 !important;
+}

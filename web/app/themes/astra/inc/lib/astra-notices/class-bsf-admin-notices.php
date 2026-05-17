@@ -17,7 +17,7 @@ if ( ! class_exists( 'BSF_Admin_Notices' ) ) :
 	/**
 	 * BSF_Admin_Notices
 	 *
-	 * Renamed from BSF_Admin_Notices. All runtime strings (AJAX action, nonce,
+	 * Renamed from Astra_Notices. All runtime strings (AJAX action, nonce,
 	 * script handles, JS globals, CSS classes, option keys, ID prefixes) are
 	 * intentionally frozen at their original values so old plugin JS/CSS that
 	 * is already shipped continues to work without updates.
@@ -33,7 +33,7 @@ if ( ! class_exists( 'BSF_Admin_Notices' ) ) :
 		 * @var string
 		 * @since 1.2.0
 		 */
-		private static $version = '1.2.0';
+		private static $version = '1.2.1';
 
 		/**
 		 * Registered notices.
@@ -107,10 +107,10 @@ if ( ! class_exists( 'BSF_Admin_Notices' ) ) :
 			}
 
 			$notice_id = sanitize_key( $args['id'] ); // Notice ID.
-			$notices   = get_option( 'allowed_BSF_Admin_Notices', array() );
+			$notices   = get_option( 'allowed_astra_notices', array() );
 			if ( ! in_array( $notice_id, $notices, true ) ) {
 				$notices[] = $notice_id; // Add notice id to the array.
-				update_option( 'allowed_BSF_Admin_Notices', $notices ); // Update the option.
+				update_option( 'allowed_astra_notices', $notices ); // Update the option.
 			}
 		}
 
@@ -137,14 +137,14 @@ if ( ! class_exists( 'BSF_Admin_Notices' ) ) :
 			 * Filters can only restrict access (return false), never grant it — if the
 			 * underlying current_user_can() check fails, filters cannot override to true.
 			 */
-			$cap_check = apply_filters( 'BSF_Admin_Notices_user_cap_check', $has_cap );
+			$cap_check = apply_filters( 'astra_notices_user_cap_check', $has_cap );
 			$cap_check = apply_filters( 'bsf_admin_notices_user_cap_check', $cap_check );
 
 			if ( ! $has_cap || ! $cap_check ) {
 				wp_send_json_error( esc_html__( 'Permission denied.', 'astra' ) );
 			}
 
-			$allowed_notices = get_option( 'allowed_BSF_Admin_Notices', array() ); // Get allowed notices.
+			$allowed_notices = get_option( 'allowed_astra_notices', array() ); // Get allowed notices.
 
 			// Define restricted user meta keys using the dynamic table prefix.
 			global $wpdb;
@@ -439,3 +439,10 @@ if ( ! class_exists( 'BSF_Admin_Notices' ) ) :
 	BSF_Admin_Notices::get_instance();
 
 endif;
+
+// Backward compatibility alias for bsf-analytics library and third-party plugins
+// that still reference the old class name. Safe to remove once all consumers
+// are updated.
+if ( ! class_exists( 'Astra_Notices' ) ) {
+	class_alias( 'BSF_Admin_Notices', 'Astra_Notices' ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.class_aliasFound
+}
