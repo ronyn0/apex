@@ -440,7 +440,8 @@ if ( ! class_exists( 'Astra_Customizer' ) ) {
 		 * @return void
 		 */
 		public function print_footer_scripts() {
-			$output  = '<script type="text/javascript">';
+			$output = '<script type="text/javascript">';
+
 			$output .= '
 	        	wp.customize.bind(\'ready\', function() {
 	            	wp.customize.control.each(function(ctrl, i) {
@@ -983,6 +984,9 @@ if ( ! class_exists( 'Astra_Customizer' ) ) {
 				case 'ast-section-toggle':
 					$config ['sanitize_callback'] = array( 'Astra_Customizer_Sanitizes', 'sanitize_toggle_control' );
 					break;
+				case 'ast-font-extras':
+					$config ['sanitize_callback'] = array( 'Astra_Customizer_Sanitizes', 'sanitize_font_extras' );
+					break;
 				default:
 					break;
 			}
@@ -1186,10 +1190,16 @@ if ( ! class_exists( 'Astra_Customizer' ) ) {
 						'blog-single'    => astra_get_pro_url( '/pricing/', 'free-theme', 'customizer', 'blog-single' ),
 						'blog-archive'   => astra_get_pro_url( '/pricing/', 'free-theme', 'customizer', 'blog-archive' ),
 						'hfb-pro-widget' => astra_get_pro_url( '/pricing/', 'free-theme', 'astra-header-footer', 'unlock-pro-widget' ),
+						'lifterlms'      => astra_get_pro_url( '/pricing/', 'free-theme', 'customizer', 'lifterlms' ),
 					),
 					/** @psalm-suppress RedundantCondition */
 					'is_woo_market_zip'       => ! ASTRA_THEME_ORG_VERSION,
 					'pro_active'              => defined( 'ASTRA_EXT_VER' ),
+					'pricingBar'              => ! defined( 'ASTRA_EXT_VER' ) ? array(
+						'text'       => __( "You\xe2\x80\x99re one step away \xe2\x80\x94 activate your license to access premium features.", 'astra' ),
+						'cta'        => __( 'Get your license now', 'astra' ),
+						'licenseUrl' => 'https://store.brainstormforce.com/account/?utm_source=free-theme&utm_medium=top-bar&utm_campaign=upgrade',
+					) : null,
 				/** @psalm-suppress RedundantCondition */
 				)
 			);
@@ -1934,6 +1944,7 @@ if ( ! class_exists( 'Astra_Customizer' ) ) {
 				'has_block_editor_support'             => Astra_Dynamic_CSS::is_block_editor_support_enabled(),
 				'updated_gb_outline_button_patterns'   => astra_button_default_padding_updated(),
 				'apply_content_bg_fullwidth_layouts'   => astra_get_option( 'apply-content-background-fullwidth-layouts', true ),
+				'is_woo_active'                        => class_exists( 'WooCommerce' ),
 				'astra_woo_btn_global_compatibility'   => is_callable( 'Astra_Dynamic_CSS::astra_woo_support_global_settings' ) ? Astra_Dynamic_CSS::astra_woo_support_global_settings() : false,
 				'v4_2_2_core_form_btns_styling'        => true === Astra_Dynamic_CSS::astra_core_form_btns_styling() ? ', #comments .submit, .search .search-submit' : '',
 				'isLifterLMS'                          => class_exists( 'LifterLMS' ),
@@ -2109,9 +2120,17 @@ if ( ! class_exists( 'Astra_Customizer' ) ) {
 }
 
 /**
- *  Kicking this off by calling 'get_instance()' method
+ * Kicking this off by calling 'get_instance()' method.
+ *
+ * All hooks registered in the constructor target admin, customizer, or AJAX contexts
+ * (customize_*, wp_ajax_*, astra_style_guide_site_icon). None fire on pure frontend
+ * requests, so skip instantiation there. Static utilities on the class (e.g.
+ * generate_logo_by_width(), is_astra_customizer(), logo_image_sizes()) remain
+ * available because they don't require the instance.
  */
-Astra_Customizer::get_instance();
+if ( is_admin() || is_customize_preview() ) {
+	Astra_Customizer::get_instance();
+}
 
 /**
  * Customizer save configs.

@@ -3591,7 +3591,7 @@ if ( ! class_exists( 'Astra_Woocommerce' ) ) {
 		 * @return void
 		 */
 		public function woocommerce_proceed_to_checkout_button_html() {
-			$cart_button_text = astra_get_option( 'woo-cart-button-text' );
+			$cart_button_text = astra_get_i18n_option( 'woo-cart-button-text', _x( '%astra%', 'WooCommerce Cart: Cart Button Text', 'astra' ) );
 
 			if ( $cart_button_text ) {
 				?>
