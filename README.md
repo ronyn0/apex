@@ -50,3 +50,7 @@ Keep track of development and community news.
 - Follow [@rootswp on Twitter](https://twitter.com/rootswp)
 - Follow the [Roots Blog](https://roots.io/blog/)
 - Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
+
+## to-do: 
+- update readme
+- create new theme
