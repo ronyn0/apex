@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: "/"
+    target-branch: dev
+    schedule:
+      interval: daily
+    groups:
+      wordpress-core:
+        patterns: ["roots/wordpress*"]
+      wp-plugins-themes:
+        patterns: ["wpackagist-*", "wp-theme/*"]
