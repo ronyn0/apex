@@ -1,56 +1,138 @@
-<p align="center">
-  <a href="https://roots.io/bedrock/">
-    <img alt="Bedrock" src="https://cdn.roots.io/app/uploads/logo-bedrock.svg" height="100">
-  </a>
-</p>
+# Apex
 
-<p align="center">
-  <a href="https://packagist.org/packages/roots/bedrock"><img alt="Packagist Installs" src="https://img.shields.io/packagist/dt/roots/bedrock?label=projects%20created&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <a href="https://packagist.org/packages/roots/wordpress"><img alt="roots/wordpress Packagist Downloads" src="https://img.shields.io/packagist/dt/roots/wordpress?label=roots%2Fwordpress%20downloads&logo=roots&logoColor=white&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/roots/bedrock/master/composer.json&label=wordpress&logo=roots&logoColor=white&query=$.require[%22roots/wordpress%22]&colorB=2b3072&colorA=525ddc&style=flat-square">
-  <a href="https://github.com/roots/bedrock/actions/workflows/ci.yml"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/roots/bedrock/ci.yml?branch=master&logo=github&label=CI&style=flat-square"></a>
-  <a href="https://twitter.com/rootswp"><img alt="Follow Roots" src="https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square"></a>
-  <a href="https://github.com/sponsors/roots"><img src="https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=" alt="Sponsor Roots"></a>
-</p>
+A personal WordPress blog built on [Bedrock](https://roots.io/bedrock/). Composer manages WordPress core, plugins and themes. Logins go through Authentik single sign-on, and Authentik/lldap group membership sets each user's WordPress role. The custom **Apex** theme also serves themed error pages for the other apps behind the reverse proxy.
 
-<p align="center">WordPress boilerplate with Composer, easier configuration, and an improved folder structure</p>
+- **WordPress** 6.9 (`roots/wordpress`), PHP ≥ 8.3
+- **Theme:** [`web/app/themes/apex`](web/app/themes/apex/), a minimal dark classic theme ([theme README](web/app/themes/apex/README.md))
+- **SSO:** [OpenID Connect Generic](https://wordpress.org/plugins/daggerhart-openid-connect-generic/) plugin, configured in [`web/app/mu-plugins/oidc-config.php`](web/app/mu-plugins/oidc-config.php)
+- **Deploys:** a GitHub webhook pulls `main` onto the server
+- **Updates:** Dependabot opens Composer update PRs against `dev` every day
 
-<p align="center">
-  <a href="https://roots.io/bedrock/">Website</a> &nbsp;&nbsp; <a href="https://roots.io/bedrock/docs/installation/">Documentation</a> &nbsp;&nbsp; <a href="https://github.com/roots/bedrock/releases">Releases</a> &nbsp;&nbsp; <a href="https://discourse.roots.io/">Community</a>
-</p>
+## Repository layout
 
-## Support us
+```
+config/
+  application.php          Base (production) config, read from .env
+  environments/            Overrides per WP_ENV (development, staging)
+web/                       Document root
+  app/
+    mu-plugins/            Always-on plugins (tracked: single-file ones)
+      oidc-config.php      SSO settings and group → role mapping
+    plugins/               Composer-installed (gitignored)
+    themes/apex/           The site theme (tracked)
+    uploads/               Media (gitignored)
+  wp/                      WordPress core, Composer-installed (gitignored)
+  deploy.php               Deploy webhook, server-only (gitignored)
+bin/setup-local.sh         Local Apache/PHP/MariaDB setup (Ubuntu)
+```
 
-We're dedicated to pushing modern WordPress development forward through our open source projects, and we need your support to keep building. You can support our work by purchasing [Radicle](https://roots.io/radicle/), our recommended WordPress stack, or by [sponsoring us on GitHub](https://github.com/sponsors/roots). Every contribution directly helps us create better tools for the WordPress ecosystem.
+Everything Composer installs (`vendor/`, `web/wp/`, plugins, third-party themes) is gitignored. `composer.lock` decides what gets installed.
 
-### Sponsors
+## Configuration (`.env`)
 
-<a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" width="120" height="90"></a> <a href="https://wordpress.com/"><img src="https://cdn.roots.io/app/uploads/wordpress.svg" alt="WordPress.com" width="120" height="90"></a> <a href="https://www.itineris.co.uk/"><img src="https://cdn.roots.io/app/uploads/itineris.svg" alt="Itineris" width="120" height="90"></a> <a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="120" height="90"></a>
+Copy `.env.example` to `.env` and fill it in. The file is gitignored; keep it `chmod 600`.
 
-## Overview
+| Variable | Notes |
+| --- | --- |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST` | Database connection |
+| `WP_ENV` | `development`, `staging` or `production` (picks `config/environments/*.php`) |
+| `WP_HOME`, `WP_SITEURL` | Site URL; `WP_SITEURL` is `${WP_HOME}/wp` |
+| `AUTH_KEY` … `NONCE_SALT` | Unique random values per environment ([generator](https://roots.io/salts.html)) |
+| `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | From the WordPress provider in Authentik |
+| `OIDC_ISSUER` | `https://auth.ronyn.cx/application/o/wordpress/` |
 
-Bedrock is a WordPress boilerplate for developers that want to manage their projects with Git and Composer. Much of the philosophy behind Bedrock is inspired by the [Twelve-Factor App](http://12factor.net/) methodology, including the [WordPress specific version](https://roots.io/twelve-factor-wordpress/).
+Production (no `WP_ENV`, or `production`) blocks file edits and plugin installs from the dashboard. Add or update plugins with Composer instead.
 
-- Better folder structure
-- Dependency management with [Composer](https://getcomposer.org)
-- Easy WordPress configuration with environment specific files
-- Environment variables with [Dotenv](https://github.com/vlucas/phpdotenv)
-- Autoloader for mu-plugins (use regular plugins as mu-plugins)
+## Local development
 
-## Getting Started
+Assumes Ubuntu with PHP 8.5 and Composer.
 
-See the [Bedrock installation documentation](https://roots.io/bedrock/docs/installation/).
+1. Install dependencies, then create and fill in `.env`:
+   ```sh
+   composer install
+   cp .env.example .env   # then edit it; use WP_HOME='https://ronyn.test'
+   ```
+2. Point the hostname at your machine, in `/etc/hosts`:
+   ```
+   127.0.0.1 ronyn.test
+   ```
+3. Set up Apache, PHP-FPM, MariaDB and a trusted HTTPS certificate. Run the script as yourself; it uses `sudo` when it needs to:
+   ```sh
+   bin/setup-local.sh
+   ```
+   PHP runs as your user, so uploads and caches write straight into the repo. Restart your browser once afterwards, so it trusts the local certificate.
+4. Create the database tables and admin user, then switch on the theme and SSO:
+   ```sh
+   wp core install --url=https://ronyn.test --title="Apex" --admin_user=<you> --admin_email=<email> --prompt=admin_password
+   wp theme activate apex
+   wp plugin activate daggerhart-openid-connect-generic
+   ```
 
-## Community
+`wp core install` only sets up the database. Composer has already installed the WordPress files, so never use `wp core download` or `wp core update` here.
 
-Keep track of development and community news.
+Lint and test:
 
-- Join us on Discord by [sponsoring us on GitHub](https://github.com/sponsors/roots)
-- Join us on [Roots Discourse](https://discourse.roots.io/)
-- Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-- Follow the [Roots Blog](https://roots.io/blog/)
-- Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
+```sh
+composer lint       # Laravel Pint (composer lint:fix to fix)
+composer test       # Pest
+```
 
-## to-do: 
-- update readme
-- create new theme
+Logs: `web/app/debug.log` (PHP, in development) and `/var/log/apache2/ronyn.test-error.log`.
+
+## Single sign-on
+
+Users log in with **Login with OpenID Connect** on `wp-login.php`. Authentik is the identity provider, and lldap holds the users and groups.
+
+- The plugin reads `client_id`, `client_secret` and `issuer` from the `OIDC_*` constants. Everything else (endpoints, scopes, user linking) is set in `oidc-config.php` and overrides anything saved on **Settings → OpenID Connect Client**.
+- **Redirect URI.** Each environment's URL must be listed in the Authentik provider:
+  `<WP_HOME>/wp/wp-admin/admin-ajax.php?action=openid-connect-authorize`
+- **Roles come from groups and are re-applied on every login:**
+
+  | lldap group | WordPress role |
+  | --- | --- |
+  | `wordpress_admins` | Administrator |
+  | `wordpress_editors` | Editor |
+  | `wordpress_authors` | Author |
+
+  Users in none of these groups can't log in through SSO, and no account is created for them.
+- **Removing access.** Taking someone out of a group applies at their next login. Their current session stays valid for up to 2 days. To cut access right away, deactivate the user or revoke their sessions in Authentik, and use **Log Out Everywhere** on their WordPress profile.
+- The plugin keeps a debug log (**Settings → OpenID Connect Client → Logs**) in development only.
+
+If login fails with `invalid_client`, the client secret in `.env` doesn't match Authentik.
+
+## Branches and deployment
+
+All work happens on **`dev`**. When something is ready, open a PR from `dev` to **`main`**. Merging to `main` deploys to production automatically.
+
+```
+dev ──PR──▶ main ──push──▶ GitHub webhook ──▶ web/deploy.php ──▶ /usr/local/bin/deploy-apex
+```
+
+- **GitHub webhook:** repo **Settings → Webhooks**, sends `push` events as `application/json` to `https://<production site>/deploy.php`, signed with a secret.
+- **`web/deploy.php`** lives only on the server; it's gitignored. It:
+  - rejects requests unless the `X-Hub-Signature-256` HMAC matches the secret in `/var/www/.deploy-secret`;
+  - answers GitHub's `ping` event;
+  - ignores everything except pushes to `refs/heads/main`;
+  - starts `/usr/local/bin/deploy-apex` in the background and returns `202` straight away.
+- **`/usr/local/bin/deploy-apex`** (server-only) updates the checkout to `main`. Because WordPress core, plugins and `vendor/` aren't in git, it must also run `composer install --no-dev` for changes to `composer.lock` to take effect.
+
+GitHub's delivery log (**Settings → Webhooks → Recent Deliveries**) shows each delivery's response: `202 Deploy started`, `Ignored`, or `403 Unauthorized` if the secrets don't match.
+
+### Manual steps after some deploys
+
+These live in the database, so a deploy doesn't do them:
+
+| Change | Run on the server |
+| --- | --- |
+| A new plugin was added | `wp plugin activate <name>` |
+| Theme switched or URL rules changed | `wp theme activate apex` / `wp rewrite flush` |
+| WordPress core update with database changes | `wp core update-db` |
+
+### Updating dependencies
+
+- Dependabot opens grouped PRs against `dev` every day, one group for WordPress core and one for plugins/themes. Merge them into `dev`, test locally, then PR to `main`.
+- By hand: `composer update roots/wordpress roots/wordpress-no-content` (core), or `composer require wpackagist-plugin/<slug>` (new plugin). Commit `composer.lock`.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
