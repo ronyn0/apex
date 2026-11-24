@@ -3,7 +3,7 @@
 A personal WordPress blog at **https://ronyn.cx**, built on [Bedrock](https://roots.io/bedrock/). Composer manages WordPress core, plugins and themes. Logins go through Authentik single sign-on, and Authentik/lldap group membership sets each user's WordPress role. The custom **Apex** theme also serves themed error pages for the other apps behind the reverse proxy.
 
 - **WordPress** 7.1 (`roots/wordpress`), PHP ≥ 8.3
-- **Theme:** [`web/app/themes/apex`](web/app/themes/apex/), a minimal dark classic theme ([theme README](web/app/themes/apex/README.md))
+- **Theme:** [`web/app/themes/apex`](web/app/themes/apex/), a minimal dark classic theme ([theme README](web/app/themes/apex/README.md)). Twenty Twenty-Five is installed as a fallback.
 - **SSO:** [OpenID Connect Generic](https://wordpress.org/plugins/daggerhart-openid-connect-generic/) plugin, configured in [`web/app/mu-plugins/oidc-config.php`](web/app/mu-plugins/oidc-config.php)
 - **Deploys:** a GitHub webhook pulls `main` onto the server
 - **Updates:** Dependabot opens Composer update PRs against `dev` every day
@@ -98,6 +98,7 @@ Users log in with **Login with OpenID Connect** on `wp-login.php`. Authentik is 
   Users in none of these groups can't log in through SSO, and no account is created for them.
 - **Removing access.** Taking someone out of a group applies at their next login. Their current session stays valid for up to 2 days. To cut access right away, deactivate the user or revoke their sessions in Authentik, and use **Log Out Everywhere** on their WordPress profile.
 - The plugin keeps a debug log (**Settings → OpenID Connect Client → Logs**) in development only.
+- **No other ways to log in.** [`apex-hardening.php`](web/app/mu-plugins/apex-hardening.php) switches off XML-RPC and application passwords. The normal `wp-login.php` form still works with each user's local password, for emergencies; keep those passwords long and unused.
 
 If login fails with `invalid_client`, the client secret in `.env` doesn't match Authentik.
 
@@ -178,7 +179,31 @@ These live in the database, so a deploy doesn't do them. Run them in `/var/www/a
 
 - Dependabot opens grouped PRs against `dev` every day, one group for WordPress core and one for plugins/themes. Merge them into `dev`, test locally, then PR to `main`.
 - By hand: `composer update roots/wordpress roots/wordpress-no-content` (core), or `composer require wpackagist-plugin/<slug>` (new plugin). Commit `composer.lock`.
+- **A core update to a new major or minor version** (7.1 → 7.2) usually changes the database. Locally, run `wp core update-db` and test. On production, back up first (`sudo -u www-data wp db export - > ~/apex-pre-<version>.sql`), deploy, then run `sudo -u www-data wp core update-db` straight away. Until you do, wp-admin shows a "Database update required" screen.
 
-## Changelog
+## Releases
 
-See [CHANGELOG.md](CHANGELOG.md).
+Each deploy that's worth a version gets a git tag and a section in [CHANGELOG.md](CHANGELOG.md), following [Semantic Versioning](https://semver.org/):
+
+| Bump | When |
+| --- | --- |
+| Patch (1.1.**1**) | Fixes, dependency updates within the same WordPress minor version |
+| Minor (1.**2**.0) | New features, WordPress minor/major upgrades, removed plugins or themes |
+| Major (**2**.0.0) | Changes that break existing URLs or logins (permalink structure, SSO provider) |
+
+To release:
+
+1. While working on `dev`, add entries under `## [Unreleased]` in the changelog.
+2. Rename that section to `## [x.y.z] - YYYY-MM-DD`, add an empty `## [Unreleased]` above it, and update the links at the bottom (`[Unreleased]` compares `vx.y.z...HEAD`; `[x.y.z]` compares the previous tag with `vx.y.z`).
+3. Commit on `dev`, then merge to `main`, tag and push:
+   ```sh
+   git push origin dev
+   git checkout main && git pull --ff-only origin main
+   git merge --no-ff dev -m "Release vx.y.z"
+   git tag -a vx.y.z -m "vx.y.z: <one-line summary>"
+   git push origin main && git push origin vx.y.z
+   git checkout dev
+   ```
+4. Do any server steps the changelog lists (`wp core update-db`, plugin activation, and so on), and watch `journalctl -t deploy-apex -f`.
+
+Pushing the tag also reaches the webhook, which answers `Ignored`; only the push to `main` deploys.
