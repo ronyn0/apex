@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schemas.wp.org/wp/6.6/theme.json",
+    "version": 3,
+    "settings": {
+        "appearanceTools": false,
+        "color": {
+            "defaultPalette": false,
+            "defaultGradients": false,
+            "custom": false,
+            "customGradient": false,
+            "palette": [
+                { "slug": "background", "name": "Background", "color": "#0d0d0d" },
+                { "slug": "surface", "name": "Surface", "color": "#161616" },
+                { "slug": "border", "name": "Border", "color": "#222222" },
+                { "slug": "text", "name": "Text", "color": "#ffffff" },
+                { "slug": "muted", "name": "Muted", "color": "#888888" },
+                { "slug": "accent", "name": "Accent", "color": "#e24b4a" },
+                { "slug": "accent-hover", "name": "Accent hover", "color": "#c03a39" }
+            ]
+        },
+        "typography": {
+            "defaultFontSizes": false,
+            "fontFamilies": [
+                {
+                    "slug": "sans",
+                    "name": "System sans",
+                    "fontFamily": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+                },
+                {
+                    "slug": "mono",
+                    "name": "System mono",
+                    "fontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+                }
+            ],
+            "fontSizes": [
+                { "slug": "small", "name": "Small", "size": "0.875rem" },
+                { "slug": "medium", "name": "Medium", "size": "1.0625rem" },
+                { "slug": "large", "name": "Large", "size": "1.375rem" },
+                { "slug": "x-large", "name": "Extra large", "size": "2rem" }
+            ]
+        },
+        "layout": {
+            "contentSize": "42rem",
+            "wideSize": "64rem"
+        }
+    },
+    "styles": {
+        "color": {
+            "background": "var(--wp--preset--color--background)",
+            "text": "var(--wp--preset--color--text)"
+        },
+        "typography": {
+            "fontFamily": "var(--wp--preset--font-family--sans)"
+        },
+        "elements": {
+            "link": {
+                "color": { "text": "var(--wp--preset--color--accent)" }
+            },
+            "button": {
+                "color": {
+                    "background": "var(--wp--preset--color--accent)",
+                    "text": "var(--wp--preset--color--text)"
+                }
+            }
+        }
+    }
+}
