@@ -4,9 +4,20 @@ Notable changes to this site. The format follows [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-23
+
+WordPress 7.1, a simpler home page, Astra removed, and the non-SSO logins closed.
+
 ### Changed
 - WordPress core upgraded from 6.9.12 to **7.1.5**. It needs a database upgrade (`wp core update-db`, schema 60717 → 61833).
 - The home page now lists the latest posts, with the site tagline as a short intro line, instead of the Astra starter-template demo page.
+
+### Removed
+- The Astra theme (`wpackagist-theme/astra`) and the Apex child theme. The deploy uninstalls Astra. Twenty Twenty-Five stays installed as a fallback theme.
+
+### Security
+- XML-RPC and application passwords are switched off (`mu-plugins/apex-hardening.php`). SSO is the only way to log in, and both of those accepted local WordPress passwords.
+- Production cleanup, done on the server rather than in code: 47 unexplained posts titled "x" were trashed. They were created as the admin between 2026-07-28 and 2026-10-31, on the previous host. The salts, the admin's local password and the database password were all changed.
 
 ## [1.0.0] - 2026-11-23
 
@@ -64,5 +75,6 @@ The first tagged release: a custom theme, themed error pages for the other apps 
 - Removed "Howdy" from the admin bar.
 - The deploy webhook script (`web/deploy.php`) is gitignored, so it stays on the server only.
 
-[Unreleased]: https://github.com/ronyn0/apex/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ronyn0/apex/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ronyn0/apex/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ronyn0/apex/releases/tag/v1.0.0
