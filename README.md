@@ -1,6 +1,6 @@
 # Apex
 
-A personal WordPress blog built on [Bedrock](https://roots.io/bedrock/). Composer manages WordPress core, plugins and themes. Logins go through Authentik single sign-on, and Authentik/lldap group membership sets each user's WordPress role. The custom **Apex** theme also serves themed error pages for the other apps behind the reverse proxy.
+A personal WordPress blog at **https://ronyn.cx**, built on [Bedrock](https://roots.io/bedrock/). Composer manages WordPress core, plugins and themes. Logins go through Authentik single sign-on, and Authentik/lldap group membership sets each user's WordPress role. The custom **Apex** theme also serves themed error pages for the other apps behind the reverse proxy.
 
 - **WordPress** 6.9 (`roots/wordpress`), PHP ≥ 8.3
 - **Theme:** [`web/app/themes/apex`](web/app/themes/apex/), a minimal dark classic theme ([theme README](web/app/themes/apex/README.md))
@@ -85,7 +85,8 @@ Users log in with **Login with OpenID Connect** on `wp-login.php`. Authentik is 
 
 - The plugin reads `client_id`, `client_secret` and `issuer` from the `OIDC_*` constants. Everything else (endpoints, scopes, user linking) is set in `oidc-config.php` and overrides anything saved on **Settings → OpenID Connect Client**.
 - **Redirect URI.** Each environment's URL must be listed in the Authentik provider:
-  `<WP_HOME>/wp/wp-admin/admin-ajax.php?action=openid-connect-authorize`
+  - `https://ronyn.cx/wp/wp-admin/admin-ajax.php?action=openid-connect-authorize` (production)
+  - `https://ronyn.test/wp/wp-admin/admin-ajax.php?action=openid-connect-authorize` (local)
 - **Roles come from groups and are re-applied on every login:**
 
   | lldap group | WordPress role |
@@ -108,19 +109,36 @@ All work happens on **`dev`**. When something is ready, open a PR from `dev` to 
 dev ──PR──▶ main ──push──▶ GitHub webhook ──▶ web/deploy.php ──▶ /usr/local/bin/deploy-apex
 ```
 
-- **GitHub webhook:** repo **Settings → Webhooks**, sends `push` events as `application/json` to `https://<production site>/deploy.php`, signed with a secret.
+- **GitHub webhook:** repo **Settings → Webhooks**, sends `push` events as `application/json` to `https://ronyn.cx/deploy.php`, signed with a secret.
 - **`web/deploy.php`** lives only on the server; it's gitignored. It:
   - rejects requests unless the `X-Hub-Signature-256` HMAC matches the secret in `/var/www/.deploy-secret`;
   - answers GitHub's `ping` event;
   - ignores everything except pushes to `refs/heads/main`;
   - starts `/usr/local/bin/deploy-apex` in the background and returns `202` straight away.
-- **`/usr/local/bin/deploy-apex`** (server-only) updates the checkout to `main`. Because WordPress core, plugins and `vendor/` aren't in git, it must also run `composer install --no-dev` for changes to `composer.lock` to take effect.
+- **`/usr/local/bin/deploy-apex`** (server-only), in the checkout at `/var/www/apex`, running as `www-data` (it switches to that user with `sudo` if started by anyone else):
+  1. takes a lock (`/var/www/.composer/deploy.lock`) so only one deploy runs at a time;
+  2. `git fetch origin main`, then `git merge --ff-only origin/main`;
+  3. `composer install --no-dev --no-interaction --optimize-autoloader`, which installs WordPress core, plugins and themes from `composer.lock`;
+  4. logs `Deployed <commit>`.
 
-GitHub's delivery log (**Settings → Webhooks → Recent Deliveries**) shows each delivery's response: `202 Deploy started`, `Ignored`, or `403 Unauthorized` if the secrets don't match.
+### Checking a deploy
+
+- **Server log:** every run, including git and Composer output, goes to the system journal:
+  ```sh
+  journalctl -t deploy-apex -n 50     # recent runs
+  journalctl -t deploy-apex -f        # watch live
+  ```
+- **GitHub:** **Settings → Webhooks → Recent Deliveries** shows each delivery's response: `202 Deploy started`, `Ignored` (not a push to `main`), or `403 Unauthorized` (the secrets don't match).
+- **To redeploy by hand**, run `deploy-apex` on the server as yourself. It does the git and Composer steps as `www-data`.
+
+### When a deploy doesn't go through
+
+- **`Not possible to fast-forward`:** the server's checkout has commits or changes that aren't on `main`, probably from an edit made directly on the server. Look with `sudo -u www-data git -C /var/www/apex status`, and move those changes into git through `dev` instead.
+- **`Deploy already running`:** a second push came in while a deploy was still running, so it was skipped. The skipped commit goes out with the next deploy; to send it now, run `deploy-apex` by hand.
 
 ### Manual steps after some deploys
 
-These live in the database, so a deploy doesn't do them:
+These live in the database, so a deploy doesn't do them. Run them in `/var/www/apex` as the site's user, `sudo -u www-data wp …`, so any files they write are owned by `www-data`:
 
 | Change | Run on the server |
 | --- | --- |
