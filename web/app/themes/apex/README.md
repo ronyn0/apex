@@ -14,13 +14,13 @@ A minimal dark blog theme with no parent theme. Classic PHP templates; colors an
 1. Activate it: **Appearance → Themes → Apex** (or `wp theme activate apex`). Activating also registers the `/error/` URL.
 2. Add a menu under **Appearance → Menus** and assign it to **Primary**. With no menu, the header shows just the site name.
 
-If `/error/502/` ever returns the blog home page instead of the error page, the URL rules need refreshing: **Settings → Permalinks → Save**, or `wp rewrite flush`. `/?apex_error=502` always works, even without the URL rules.
-
 ## Error pages for other apps
 
-`https://<blog>/error/<code>/` returns a themed page **with that HTTP status**. The page has no-cache and noindex headers, and a `Retry-After` header for 502–504. There's specific wording for 400, 401, 403, 404, 500, 502, 503 and 504. Any other 4xx/5xx code gets a generic message.
+`https://ronyn.cx/error/<code>/` returns a themed page **with that HTTP status**. The page has no-cache and noindex headers, and a `Retry-After` header for 502–504. There's specific wording for 400, 401, 403, 404, 500, 502, 503 and 504. Any other 4xx/5xx code gets a generic message.
 
-Point each app's reverse-proxy config at it. Replace `blog.example.com` with the blog's hostname.
+The address needs URL rewriting on the web server (see the main README, "Production server"). Without it, use `/index.php/error/<code>/` or `/?apex_error=<code>` instead. If the error page ever shows the blog home page, the URL rules need refreshing: **Settings → Permalinks → Save**, or `wp rewrite flush`.
+
+Point each app's reverse-proxy config at it.
 
 ### nginx / Nginx Proxy Manager
 
@@ -33,12 +33,14 @@ error_page 504 /__apex_error/504/;
 
 location ^~ /__apex_error/ {
     internal;
-    rewrite ^/__apex_error/(\d{3})/$ /error/$1/ break;
-    proxy_pass https://blog.example.com;
-    proxy_set_header Host blog.example.com;
-    proxy_ssl_server_name on;
+    rewrite ^/__apex_error/([0-9]+)/$ /error/$1/ break;
+    proxy_pass http://192.168.22.14;
+    proxy_set_header Host ronyn.cx;
+    proxy_set_header X-Forwarded-Proto https;
 }
 ```
+
+`proxy_pass` goes straight to Apache on `debncsvr01` over the LAN, not out through the public address and back. Don't write the pattern as `\d{3}`: nginx reads the `{}` as a block and rejects the config.
 
 This covers the errors nginx generates itself: the app is down, refusing connections or timing out. To also replace error pages the app sends itself (its own 500 page, say), add `proxy_intercept_errors on;` and the codes you want to replace. Don't do this for apps with an API, because it replaces their JSON error bodies too.
 
@@ -50,7 +52,7 @@ app.example.com {
 
     handle_errors 502 503 504 {
         rewrite * /error/{err.status_code}/
-        reverse_proxy https://blog.example.com {
+        reverse_proxy https://ronyn.cx {
             header_up Host {upstream_hostport}
         }
     }
@@ -71,7 +73,7 @@ http:
     apex-blog:
       loadBalancer:
         servers:
-          - url: "https://blog.example.com"
+          - url: "https://ronyn.cx"
 ```
 
 Then add `apex-errors` to each app router's `middlewares`.
@@ -83,7 +85,7 @@ A 302 is a normal redirect, not an error, so the proxy has to pass it through fo
 ## Testing
 
 ```sh
-curl -sI https://blog.example.com/error/502/   # expect: HTTP/2 502, Retry-After: 30
+curl -sI https://ronyn.cx/error/502/   # expect: HTTP/2 502, Retry-After: 30
 ```
 
 To see the page through the proxy, stop an app's container or VM and load its address.
