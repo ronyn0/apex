@@ -15,6 +15,10 @@ get_header();
     <header class="page-header">
         <?php the_archive_title('<h1 class="page-title">', '</h1>'); ?>
     </header>
+<?php elseif (is_front_page() && ! is_paged() && get_bloginfo('description')) : ?>
+    <header class="page-header home-intro">
+        <p class="home-intro__lead"><?php bloginfo('description'); ?></p>
+    </header>
 <?php endif; ?>
 
 <?php if (have_posts()) : ?>

@@ -2,7 +2,7 @@
 
 A personal WordPress blog at **https://ronyn.cx**, built on [Bedrock](https://roots.io/bedrock/). Composer manages WordPress core, plugins and themes. Logins go through Authentik single sign-on, and Authentik/lldap group membership sets each user's WordPress role. The custom **Apex** theme also serves themed error pages for the other apps behind the reverse proxy.
 
-- **WordPress** 6.9 (`roots/wordpress`), PHP ≥ 8.3
+- **WordPress** 7.1 (`roots/wordpress`), PHP ≥ 8.3
 - **Theme:** [`web/app/themes/apex`](web/app/themes/apex/), a minimal dark classic theme ([theme README](web/app/themes/apex/README.md))
 - **SSO:** [OpenID Connect Generic](https://wordpress.org/plugins/daggerhart-openid-connect-generic/) plugin, configured in [`web/app/mu-plugins/oidc-config.php`](web/app/mu-plugins/oidc-config.php)
 - **Deploys:** a GitHub webhook pulls `main` onto the server

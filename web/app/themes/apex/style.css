@@ -138,6 +138,13 @@ video {
     letter-spacing: -0.01em;
 }
 
+.home-intro__lead {
+    margin: 0;
+    color: #ccc;
+    font-size: 1.25rem;
+    line-height: 1.5;
+}
+
 .entry-meta {
     margin-top: 0.5rem;
     color: var(--muted);
