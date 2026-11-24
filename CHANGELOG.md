@@ -4,6 +4,10 @@ Notable changes to this site. The format follows [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
+- WordPress core upgraded from 6.9.12 to **7.1.5**. It needs a database upgrade (`wp core update-db`, schema 60717 → 61833).
+- The home page now lists the latest posts, with the site tagline as a short intro line, instead of the Astra starter-template demo page.
+
 ## [1.0.0] - 2026-11-23
 
 The first tagged release: a custom theme, themed error pages for the other apps behind Nginx Proxy Manager, working SSO configuration, and clean permalinks.

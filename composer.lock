@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91888362bf4507b6cc11cfedbd9ac207",
+    "content-hash": "ec6fd7a649aeabf3c861c0c2a6445cb5",
     "packages": [
         {
             "name": "composer/installers",
@@ -480,7 +480,7 @@
         },
         {
             "name": "roots/wordpress",
-            "version": "6.9.12",
+            "version": "7.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roots/wordpress.git",
@@ -511,7 +511,7 @@
             ],
             "support": {
                 "issues": "https://github.com/roots/wordpress/issues",
-                "source": "https://github.com/roots/wordpress/tree/7.1.4"
+                "source": "https://github.com/roots/wordpress/tree/7.1.5"
             },
             "funding": [
                 {
@@ -590,23 +590,23 @@
         },
         {
             "name": "roots/wordpress-no-content",
-            "version": "6.9.12",
+            "version": "7.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress.git",
-                "reference": "6.9.12"
+                "reference": "7.1.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.w.org/release/wordpress-6.9.12-no-content.zip",
-                "reference": "6.9.12",
-                "shasum": "95cad296bfe03f312a496678dbc8e04ae2abd206"
+                "url": "https://downloads.w.org/release/wordpress-7.1.5-no-content.zip",
+                "reference": "7.1.5",
+                "shasum": "360c3644ce4e382e254aa4f0c1e56d5082efe2ff"
             },
             "require": {
-                "php": ">= 7.2.24"
+                "php": ">= 7.4"
             },
             "provide": {
-                "wordpress/core-implementation": "6.9.12"
+                "wordpress/core-implementation": "7.1.5"
             },
             "suggest": {
                 "ext-curl": "Performs remote request operations.",
@@ -657,7 +657,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-11-18T17:13:36+00:00"
+            "time": "2026-11-18T17:13:39+00:00"
         },
         {
             "name": "roots/wp-config",
