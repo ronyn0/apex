@@ -1,16 +1,21 @@
 # Changelog
 
-Notable changes to this site. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Each section is a merge to `main`, which is a production deploy. The site isn't versioned, so sections are dated.
+Notable changes to this site. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and releases use [Semantic Versioning](https://semver.org/). Each release is a tagged merge to `main`, which is a production deploy. Changes from before the first tagged release are grouped by deploy date.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-23
+
+The first tagged release: a custom theme, themed error pages for the other apps behind Nginx Proxy Manager, working SSO configuration, and clean permalinks.
+
 ### Added
 - **Apex theme** (`web/app/themes/apex`): a minimal dark classic theme for blog posts that replaces the Astra child theme. It has no parent theme and no upsell notices.
-- **Themed error pages** at `/error/<code>/`, for the reverse proxy to show when other apps are down or erroring. Each page returns the real HTTP status. Setup is in the theme README.
+- **Themed error pages** at `/error/<code>/`. Nginx Proxy Manager serves them for other apps' 502/503/504 errors (set up per proxy host in the Advanced tab; see the theme README). Each page returns the real HTTP status and has a **Try again** button that reloads the app.
 - `bin/setup-local.sh`: sets up a local Apache, PHP-FPM, MariaDB and HTTPS environment on Ubuntu.
-- Project README covering setup, SSO and deployment, plus this changelog.
+- Project README covering local setup, SSO, the production server and deployment, plus this changelog.
 
 ### Changed
+- Permalinks are now `/%postname%/` instead of `/index.php/%year%/%monthnum%/%day%/%postname%/`. Apache on the production server now rewrites URLs (`apex-rewrite.conf`; see README, "Production server"). Old `/index.php/` page links redirect, but old dated post links return 404.
 - SSO: users must be in a mapped lldap group (`wordpress_admins`, `wordpress_editors`, `wordpress_authors`) to log in. Their role is re-synced from groups on every login, so demotions take effect. Previously, users with no groups kept their old role.
 - SSO: the plugin's debug log is now on only in development.
 - The admin-bar "Howdy" removal moved into the Apex theme. It now edits the admin bar directly instead of filtering every translated string.
@@ -54,3 +59,6 @@ Notable changes to this site. The format follows [Keep a Changelog](https://keep
 ### Changed
 - Removed "Howdy" from the admin bar.
 - The deploy webhook script (`web/deploy.php`) is gitignored, so it stays on the server only.
+
+[Unreleased]: https://github.com/ronyn0/apex/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ronyn0/apex/releases/tag/v1.0.0

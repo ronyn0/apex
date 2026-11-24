@@ -101,6 +101,34 @@ Users log in with **Login with OpenID Connect** on `wp-login.php`. Authentik is 
 
 If login fails with `invalid_client`, the client secret in `.env` doesn't match Authentik.
 
+## Production server
+
+ronyn.cx runs on `debncsvr01` (Debian, Apache 2.4, PHP). Nginx Proxy Manager sits in front, handles HTTPS, and passes requests to Apache on port 80.
+
+| What | Where |
+| --- | --- |
+| Checkout (owned by `www-data`) | `/var/www/apex`, document root `/var/www/apex/web` |
+| Site config | `/etc/apache2/sites-enabled/ronyn.cx.conf`: takes real client IPs from NPM, sends `.well-known` CalDAV/CardDAV requests to Nextcloud, sets HSTS |
+| Permalink rewrites | `/etc/apache2/conf-available/apex-rewrite.conf` (switched on with `a2enconf apex-rewrite`) |
+| Nextcloud | `/var/www/nextcloud`, served at `/nextcloud/` by `sites-enabled/nextcloud.conf` |
+| Logs | `/var/log/apache2/ronyn-access.log`, `ronyn-error.log`, and `journalctl -t deploy-apex` |
+
+Permalinks are `/%postname%/`. The rewrite rules live in Apache's config rather than `.htaccess`, which is gitignored and which WordPress may overwrite:
+
+```apache
+<Directory /var/www/apex/web>
+    RewriteEngine On
+    # Leave Nextcloud (/nextcloud) to its own rules
+    RewriteRule ^nextcloud(/|$) - [L]
+    RewriteRule ^index\.php$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</Directory>
+```
+
+After changing Apache config, run `sudo apache2ctl configtest && sudo systemctl reload apache2`. Then check that `https://ronyn.cx/nextcloud/status.php` still responds.
+
 ## Branches and deployment
 
 All work happens on **`dev`**. When something is ready, open a PR from `dev` to **`main`**. Merging to `main` deploys to production automatically.
