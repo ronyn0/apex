@@ -1,28 +1,9 @@
 {
-  "name": "roots/bedrock",
+  "name": "ronyn0/apex",
   "type": "project",
-  "license": "MIT",
-  "description": "WordPress boilerplate with Composer, easier configuration, and an improved folder structure",
-  "homepage": "https://roots.io/bedrock/",
-  "authors": [
-    {
-      "name": "Scott Walkinshaw",
-      "email": "scott.walkinshaw@gmail.com",
-      "homepage": "https://github.com/swalkinshaw"
-    },
-    {
-      "name": "Ben Word",
-      "email": "ben@benword.com",
-      "homepage": "https://github.com/retlehs"
-    }
-  ],
-  "keywords": [
-    "bedrock", "composer", "roots", "wordpress-composer", "wordpress", "wp-composer", "wp-config", "wp"
-  ],
-  "support": {
-    "issues": "https://github.com/roots/bedrock/issues",
-    "forum": "https://discourse.roots.io/category/bedrock"
-  },
+  "license": "proprietary",
+  "description": "Personal WordPress blog at ronyn.cx, built on Bedrock",
+  "homepage": "https://ronyn.cx",
   "repositories": [
     {
       "name": "wpackagist",
