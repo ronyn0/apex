@@ -98,9 +98,9 @@ Config::define('WP_SITEURL', env('WP_SITEURL'));
 /**
  * Authentik OIDC
  */
-Config::define('OIDC_CLIENT_ID',      env('OIDC_CLIENT_ID'));
-Config::define('OIDC_CLIENT_SECRET',  env('OIDC_CLIENT_SECRET'));
-Config::define('OIDC_ISSUER',         env('OIDC_ISSUER'));
+Config::define('OIDC_CLIENT_ID', env('OIDC_CLIENT_ID'));
+Config::define('OIDC_CLIENT_SECRET', env('OIDC_CLIENT_SECRET'));
+Config::define('OIDC_ISSUER', env('OIDC_ISSUER'));
 
 /**
  * Custom Content Directory

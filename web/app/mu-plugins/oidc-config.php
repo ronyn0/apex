@@ -63,7 +63,7 @@ function apex_oidc_role_from_claim(array $user_claim): ?string
  * Refuse SSO login (and account creation) for users in no mapped group.
  * A missing groups claim is treated the same as "no groups".
  */
-add_filter('openid-connect-generic-user-login-test', function($allowed, $user_claim) {
+add_filter('openid-connect-generic-user-login-test', function ($allowed, $user_claim) {
     return $allowed && apex_oidc_role_from_claim((array) $user_claim) !== null;
 }, 10, 2);
 
@@ -71,7 +71,7 @@ add_filter('openid-connect-generic-user-login-test', function($allowed, $user_cl
  * Sync the WordPress role from groups on every SSO login, so demotions in
  * lldap take effect at next login.
  */
-add_action('openid-connect-generic-update-user-using-current-claim', function($user, $user_claim) {
+add_action('openid-connect-generic-update-user-using-current-claim', function ($user, $user_claim) {
     $role    = apex_oidc_role_from_claim((array) $user_claim);
     $wp_user = new WP_User($user->ID);
 
